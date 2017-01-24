@@ -1,0 +1,6 @@
+{
+  "Job": {
+    "Script"   : ".",
+    "Priority" : 0
+  }
+}
