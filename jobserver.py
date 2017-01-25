@@ -104,6 +104,8 @@ class Job(threading.Thread):
         return '<Job: file="' + self._JobFile + '", priority="' + str(self.getPriority()) + '">'
     def __str__(self):
         return self._JobFile
+    def Name(self):
+        return os.path.basename(self._JobFile)
     def getScript(self):
         try:
             with open(self._JobFile) as json_data:
