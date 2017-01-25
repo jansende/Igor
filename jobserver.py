@@ -6,6 +6,10 @@ import threading
 import time
 import subprocess
 
+#CONFIG
+min_thread_number = 2 #Linux
+#min_thread_number = 3 #Windows
+
 ##TODO:
 ## - Keep somehow track, on what the Jobs are doing
 class JobServer(threading.Thread):
@@ -54,7 +58,7 @@ class JobServer(threading.Thread):
         self._waitForJobsToFinish()
         print('Done')
     def _waitForJobsToFinish(self):
-        while threading.active_count() > 3:
+        while threading.active_count() > min_thread_number:
             time.sleep(1)
     def _getJobList(self):
         JobList = []
@@ -71,7 +75,7 @@ class JobServer(threading.Thread):
         return JobList
     def _getNumberOfRunningJobs(self):
         #python + server are always running
-        return threading.active_count() - 3
+        return threading.active_count() - min_thread_number
 class Job(threading.Thread):
     def __init__(self, JobFile):
         threading.Thread.__init__(self)
@@ -176,5 +180,5 @@ if __name__== '__main__':
     Configuration = JobServerConfiguration('config.json')
     Server = JobServer(Configuration)
     Server.start()
-    while threading.active_count() > 2:
+    while threading.active_count() > min_thread_number-1:
         time.sleep(1)
