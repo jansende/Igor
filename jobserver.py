@@ -50,7 +50,7 @@ class JobServer(threading.Thread):
                     print('Running Job: ',Thread,' (Priority: ',Thread.getPriority(),')',sep='')
                     Thread.markJobFile()
                     Thread.start()
-            print('Waiting for ',RefreshTime,'seconds...',sep='',end='')
+            print('Waiting for ',RefreshTime,'s ...',sep='',end='')
             time.sleep(RefreshTime)
             print('Done')
     def shutdown(self):
@@ -93,10 +93,11 @@ class Job(threading.Thread):
         WorkingDirectory = self.getWorkingDirectory()
         if Script is not None:
             try:
-                if subprocess.Popen(Script,cwd=WorkingDirectory,shell=True) > 0:
+                Process = subprocess.Popen(Script,cwd=WorkingDirectory,shell=True)
+                while Process.poll() is None:
+                    time.sleep(1)
+                if Process.returncode > 0:
                     raise
-##                if subprocess.check(Script,shell=True) > 0:
-##                    raise
                 self.markJobFile('Finished')
             except:
                 self.markJobFile('Error')

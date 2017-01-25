@@ -18,9 +18,9 @@ def printJobList(Configuration):
             Thread = Job(os.path.join(Configuration.JobDirectory(),File))
             JobList.append(Thread)
     JobList.sort(key = lambda x: x.getStatus())
-    print('+------------+------------+----------------------+----------+')
-    print('|   Status   |   Worker   |         Name         | Priority |')
-    print('+------------+------------+----------------------+----------+')
+    print('+------------+------------+--------------------------------+----------+')
+    print('|   Status   |   Worker   |              Name              | Priority |')
+    print('+------------+------------+--------------------------------+----------+')
     for Thread in JobList:
         Status   = Thread.getStatus()
         Priority = Thread.getPriority()
@@ -34,9 +34,9 @@ def printJobList(Configuration):
         else:
             Worker = ''
             Name   = Thread.Name()[:-5]
-        out = '| {status:10} | {worker:10} | {name:20} | {priority:<8} |'.format(status=Status,worker=Worker,name=Name,priority=Priority)
+        out = '| {status:10} | {worker:10} | {name:30} | {priority:<8} |'.format(status=Status,worker=Worker,name=Name,priority=Priority)
         print(out)
-    print('+------------+------------+----------------------+----------+')
+    print('+------------+------------+--------------------------------+----------+')
 if __name__== '__main__':
     Configuration = JobServerConfiguration('config.json')
     printJobList(Configuration)
