@@ -64,10 +64,10 @@ class JobServer(threading.Thread):
         JobList = []
         for File in os.listdir(self._Configuration.JobDirectory()):
             if File.endswith('.json'):
-                Thread = Job(File)
+                Thread = Job(os.path.join(self._Configuration.JobDirectory(),File))
                 if Thread.getStatus() == 'ToDo':
                     if self._Configuration.filterByName():
-                        if File.startswith(self._Configuration.Name()):
+                        if File.startswith(self._Configuration.Name()+'.'):
                             JobList.append(Thread)
                     else:
                         JobList.append(Thread)
