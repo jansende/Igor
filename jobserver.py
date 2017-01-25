@@ -89,11 +89,14 @@ class Job(threading.Thread):
             with open(self._JobFile,'w') as json_data:
                 json_data.write(json.dumps(Data,sort_keys=True,indent=2))
     def run(self):
-        Script = self.getScript()
+        Script           = self.getScript()
+        WorkingDirectory = self.getWorkingDirectory()
         if Script is not None:
             try:
-                if subprocess.check(Script,shell=True) > 0:
+                if subprocess.Popen(Script,cwd=WorkingDirectory,shell=True) > 0:
                     raise
+##                if subprocess.check(Script,shell=True) > 0:
+##                    raise
                 self.markJobFile('Finished')
             except:
                 self.markJobFile('Error')
@@ -128,6 +131,14 @@ class Job(threading.Thread):
         except:
             Priority = 0
         return Priority
+    def getWorkingDirectory(self):
+        try:
+            with open(self._JobFile) as json_data:
+                Data = json.load(json_data)
+                WorkingDirectory = Data['Job']['WorkingDirectory']
+        except:
+            WorkingDirectory = os.path.dirname(self._JobFile)
+        return WorkingDirectory
 class JobServerConfiguration(object):
     def __init__(self, json_file):
         self._json_file   = json_file
