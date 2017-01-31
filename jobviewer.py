@@ -21,22 +21,25 @@ def printJobList(Configuration):
     print('+------------+------------+--------------------------------+----------+')
     print('|   Status   |   Worker   |              Name              | Priority |')
     print('+------------+------------+--------------------------------+----------+')
+    #get Status
+    StatusList = []
     for Thread in JobList:
-        Status   = Thread.getStatus()
-        Priority = Thread.getPriority()
-        if Configuration.filterByName():
-            if Thread.Name()[:-5].partition('.')[1]!='':
-                Worker = Thread.Name()[:-5].partition('.')[0]
-                Name   = Thread.Name()[:-5].partition('.')[2]
-            else:
-                Worker = ''
-                Name   = Thread.Name()[:-5]
-        else:
-            Worker = ''
-            Name   = Thread.Name()[:-5]
-        out = '| {status:10} | {worker:10} | {name:30} | {priority:<8} |'.format(status=Status,worker=Worker,name=Name,priority=Priority)
-        print(out)
-    print('+------------+------------+--------------------------------+----------+')
+        Status = Thread.getStatus()
+        if Status not in StatusList:
+            StatusList.append(Status)
+    for StatusSection in StatusList:
+        for Thread in JobList:
+            Status   = Thread.getStatus()
+            Priority = Thread.getPriority()
+            Worker   = ''
+            Name     = Thread.Name()[:-5]
+            if Configuration.filterByName() and Name.partition('.')[2]!='':
+                    Worker = Name.partition('.')[0]
+                    Name   = Name.partition('.')[2]
+            if Status == StatusSection:
+                out = '| {status:10} | {worker:10} | {name:30} | {priority:<8} |'.format(status=Status,worker=Worker,name=Name,priority=Priority)
+                print(out)
+        print('+------------+------------+--------------------------------+----------+')
 if __name__== '__main__':
     Configuration = JobServerConfiguration('config.json')
     printJobList(Configuration)
