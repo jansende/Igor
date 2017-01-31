@@ -1,5 +1,5 @@
 {
-  "JobServer": {
+  "Worker": {
     "JobDirectory"     : ".",
     "filterByName"     : false,
     "RefreshTime"      : 5.0,
