@@ -5,7 +5,7 @@ import os.path
 import threading
 import time
 import subprocess
-from classes.job import Job
+from classes.job import *
 from classes.workerinformation import *
 from classes.machineinformation import *
 
@@ -69,10 +69,9 @@ class Worker(threading.Thread):
     def _getJobList(self):
         print('Looking for new Jobs...',end='')
         if self.Information.filterByName:
-            JobList = [x for x in self.Information.JobList() if x.Information.Status == 'ToDo' and x.Information.Worker == self.Machine.Name]
+            JobList = getJobList(self.Information.JobDirectory, filterByStatus = 'ToDo', filterByWorker = self.Machine.Name)
         else:
-            JobList = [x for x in self.Information.JobList() if x.Information.Status == 'ToDo']
-        JobList.sort(key = lambda x: x.Information.Priority)
+            JobList = getJobList(self.Information.JobDirectory, filterByStatus = 'ToDo')
         print('Done (',len(JobList),' found.)',sep='')
         return JobList
 

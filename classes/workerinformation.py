@@ -1,7 +1,6 @@
 import json
 import os
 import os.path
-from classes.job import Job
 
 class WorkerInformation(object):
     def __init__(self, JobDirectory = '.', filterByName = True, RefreshTime = 5.0, MaximumJobNumber = 1, Mode = 'Server'):
@@ -10,16 +9,6 @@ class WorkerInformation(object):
         self.RefreshTime      = RefreshTime
         self.MaximumJobNumber = MaximumJobNumber
         self.Mode             = Mode
-    def JobList(self):
-        List = []
-        for File in os.listdir(self.JobDirectory):
-            if File.endswith('.json'):
-                try:
-                    Thread = Job(os.path.join(self.JobDirectory,File))
-                    List.append(Thread)
-                except:
-                    continue
-        return List
     def __repr__(self):
         return '<WorkerInformation>'
 class WorkerInformationEncoder(json.JSONEncoder):

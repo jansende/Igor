@@ -6,12 +6,13 @@ import threading
 import time
 import subprocess
 
+from classes.job import *
 from classes.workerinformation import *
 
 def printJobList(File):
     with open(File) as json_file:
         WorkerInformation = json.load(json_file, cls=WorkerInformationDecoder)
-    JobList = WorkerInformation.JobList()
+    JobList = getJobList(WorkerInformation.JobDirectory)
     JobList.sort(key = lambda x: x.Information.Status)
     print('+------------+------------+--------------------------------+----------+')
     print('|   Status   |   Worker   |              Name              | Priority |')
