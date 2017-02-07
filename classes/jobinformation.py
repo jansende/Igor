@@ -2,12 +2,13 @@ import json
 import os
 
 class JobInformation(object):
-    def __init__(self, Name = 'unknown', Worker = '', Priority = 0, Status = 'ToDo', Script = '', WorkingDirectory = '.'):
+    def __init__(self, Name = 'unknown', Worker = '', Priority = 0, Status = 'ToDo', Script = '', TimeOut = None, WorkingDirectory = '.'):
         self.Name             = Name
         self.Worker           = Worker
         self.Priority         = Priority
         self.Status           = Status
         self.Script           = Script
+        self.TimeOut          = TimeOut
         self.WorkingDirectory = WorkingDirectory
     def hasErrors(self):
         return self.Status == 'Error' or \
@@ -25,6 +26,8 @@ class JobInformationEncoder(json.JSONEncoder):
             dic['Job']['Priority']         = obj.Priority
             dic['Job']['Status']           = obj.Status
             dic['Job']['Script']           = obj.Script
+            if obj.TimeOut is not None:
+                dic['Job']['TimeOut']          = obj.TimeOut
             dic['Job']['WorkingDirectory'] = obj.WorkingDirectory
             return dic
         else:
@@ -60,6 +63,10 @@ class JobInformationDecoder(json.JSONDecoder):
                 pass
             try:
                 obj.Script = dic['Job']['Script']
+            except:
+                pass
+            try:
+                obj.TimeOut = float(dic['Job']['TimeOut'])
             except:
                 pass
             try:

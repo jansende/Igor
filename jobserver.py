@@ -53,7 +53,6 @@ class Worker(threading.Thread):
                         break
                     Thread = JobList.pop()
                     print('Running Job: ',Thread,' (Priority: ',Thread.Information.Priority,')',sep='')
-                    Thread.markFile('InProgress')
                     Thread.start()
             self.sleep(self.Information.RefreshTime)
     def sleep(self, RefreshTime):
