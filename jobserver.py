@@ -42,6 +42,7 @@ class Worker(threading.Thread):
             print('Currently ',self.Machine.NumberOfRunningJobs(),' of ',self.Information.MaximumJobNumber,' Slots are running Jobs.',sep='')
             if self.Machine.NumberOfRunningJobs() < self.Information.MaximumJobNumber:
                 print('There is room for more!')
+                print('Searching for Jobs in:', self.Information.JobDirectory)
                 JobList = self._getJobList()
                 if self.Information.Mode == 'Worker' and len(JobList) == 0:
                     print('No more new Jobs available. The Server will be shut down.')

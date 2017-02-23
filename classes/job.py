@@ -16,7 +16,7 @@ class Job(threading.Thread):
             raise
         with open(self.File) as json_file:
             self.Information = json.load(json_file, cls=JobInformationDecoder)
-        if self.Information.hasErrors():
+        if self.Information.hasErrors() and self.Status != 'Error':
             self._markFile('Error')
             raise
     def _saveInformationToFile(self):
