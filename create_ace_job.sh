@@ -55,10 +55,10 @@ echo "    \"Worker\"   : \"$OPTWORKER\",                  ">>$jobfilename
 fi
 echo "    \"Script\"   : \"$script\",                     ">>$jobfilename
 echo "    \"Status\"   : \"ToDo\",                        ">>$jobfilename
-echo "    \"Priority\" : 5,                               ">>$jobfilename
 if [ -n "$OPTBASE" ]; then
-echo "    \"WorkingDirectory\" : \"$OPTBASE\"             ">>$jobfilename
+echo "    \"WorkingDirectory\" : \"$OPTBASE\",            ">>$jobfilename
 fi
+echo "    \"Priority\" : 5                                ">>$jobfilename
 echo "  }                                                 ">>$jobfilename
 echo "}                                                   ">>$jobfilename
 
