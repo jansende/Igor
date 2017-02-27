@@ -65,8 +65,8 @@ class Worker(threading.Thread):
     def _getJobList(self):
         print('Looking for new Jobs...',end='')
         if self.Information.filterByName:
-            JobList = getJobList(self.Information.JobDirectory, filterByStatus = 'ToDo', filterByWorker = self.Machine.Name)
+            JobList = getJobList(self.Information.JobDirectory, filterByStatus = 'ToDo', filterByWorker = self.Machine.Name, doCaseFold = True)
         else:
-            JobList = getJobList(self.Information.JobDirectory, filterByStatus = 'ToDo')
+            JobList = getJobList(self.Information.JobDirectory, filterByStatus = 'ToDo', doCaseFold = True)
         print('Done (',len(JobList),' found.)',sep='')
         return JobList

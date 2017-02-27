@@ -14,9 +14,9 @@ def printJobList(File):
         WorkerInformation = json.load(json_file, cls=WorkerInformationDecoder)
     JobList = getJobList(WorkerInformation.JobDirectory)
     JobList.sort(key = lambda x: x.Information.Status)
-    print('+------------+------------+--------------------------------+----------+')
-    print('|   Status   |   Worker   |              Name              | Priority |')
-    print('+------------+------------+--------------------------------+----------+')
+    print('+-----------------+------------+--------------------------------+----------+')
+    print('|     Status      |   Worker   |              Name              | Priority |')
+    print('+-----------------+------------+--------------------------------+----------+')
     StatusList = []
     for Thread in JobList:
         Status = Thread.Information.Status
@@ -29,8 +29,8 @@ def printJobList(File):
             Worker   = Thread.Information.Worker
             Name     = Thread.Information.Name
             if Status == StatusSection:
-                out = '| {status:10} | {worker:10} | {name:30} | {priority:<8} |'.format(status=Status,worker=Worker,name=Name,priority=Priority)
+                out = '| {status:15} | {worker:10} | {name:30} | {priority:<8} |'.format(status=Status,worker=Worker,name=Name,priority=Priority)
                 print(out)
-        print('+------------+------------+--------------------------------+----------+')
+        print('+-----------------+------------+--------------------------------+----------+')
 if __name__== '__main__':
     printJobList('config.json')

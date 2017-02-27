@@ -17,8 +17,8 @@ class Job(threading.Thread):
             raise
         with open(self.File) as json_file:
             self.Information = json.load(json_file, cls=JobInformationDecoder)
-        if self.Information.hasErrors() and self.Status != 'Error':
-            self._markFile('Error')
+        if self.Information.hasErrors() and self.Status != 'FileError':
+            self._markFile('FileError')
             raise
     def _saveInformationToFile(self):
         with open(self.File,'w') as json_file:
@@ -45,7 +45,7 @@ class Job(threading.Thread):
         return '<Job: file="' + self.File + '", priority="' + str(self.Information.Priority) + '">'
     def __str__(self):
         return self.File
-def getJobList(Path, filterByStatus = None, filterByWorker = None):
+def getJobList(Path, filterByStatus = None, filterByWorker = None, doCaseFold = False):
     JobList = []
     for File in os.listdir(Path):
         if File.endswith('.json'):
@@ -54,9 +54,15 @@ def getJobList(Path, filterByStatus = None, filterByWorker = None):
                 JobList.append(Thread)
             except:
                 continue
-    if filterByStatus is not None:
-        JobList = [x for x in JobList if x.Information.Status == filterByStatus]
-    if filterByWorker is not None:
-        JobList = [x for x in JobList if x.Information.Worker == filterByWorker]
+    if doCaseFold:
+        if filterByStatus is not None:
+            JobList = [x for x in JobList if x.Information.Status.casefold() == filterByStatus.casefold()]
+        if filterByWorker is not None:
+            JobList = [x for x in JobList if x.Information.Worker.casefold() == filterByWorker.casefold()]
+    else:
+        if filterByStatus is not None:
+            JobList = [x for x in JobList if x.Information.Status == filterByStatus]
+        if filterByWorker is not None:
+            JobList = [x for x in JobList if x.Information.Worker == filterByWorker]
     JobList.sort(key = lambda x: x.Information.Priority)
     return JobList
