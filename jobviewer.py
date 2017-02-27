@@ -1,13 +1,13 @@
-import socket
 import json
 import os
 import os.path
+import socket
+import subprocess
 import threading
 import time
-import subprocess
 
-from classes.job import *
-from classes.workerinformation import *
+from classes.job               import getJobList
+from classes.workerinformation import WorkerInformationDecoder
 
 def printJobList(File):
     with open(File) as json_file:

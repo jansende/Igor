@@ -1,9 +1,10 @@
 import json
-import threading
-import subprocess
 import os
 import os.path
-from classes.jobinformation import JobInformation, JobInformationEncoder, JobInformationDecoder
+import subprocess
+import threading
+
+from .jobinformation import JobInformation, JobInformationEncoder, JobInformationDecoder
 
 class Job(threading.Thread):
     def __init__(self, File):
