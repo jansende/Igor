@@ -51,7 +51,7 @@ class MachineInformationDecoder(json.JSONDecoder):
     def decode(self, s):
         obj = json.JSONDecoder.decode(self, s)
         if isinstance(obj, dict):
-            raise RuntimeError
+            raise RuntimeError('json represents a different object')
         return obj
     def default(self, dic):
         if 'Machine' not in dic:
@@ -111,6 +111,18 @@ class MachineInformationLoader(object):
         obj.System      = platform.system()
         obj.MachineType = platform.machine()
         return obj
+
+def getMachineList(Path, doCaseFold = True):
+    MachineList = []
+    for File in os.listdir(Path):
+        if File.endswith('.json'):
+            try:
+                with open(os.path.join(Path,File)) as json_file:
+                    MachineList.append(json.load(json_file, cls=MachineInformationDecoder))
+            except:
+                continue
+    MachineList.sort(key = lambda x: x.Domain)
+    return MachineList
 
 if __name__== '__main__':
     test = MachineInformationLoader().load()

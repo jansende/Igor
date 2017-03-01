@@ -45,7 +45,7 @@ class Job(threading.Thread):
         return '<Job: file="' + self.File + '", priority="' + str(self.Information.Priority) + '">'
     def __str__(self):
         return self.File
-def getJobList(Path, filterByStatus = None, filterByWorker = None, doCaseFold = False):
+def getJobList(Path, filterByStatus = None, filterByWorker = None, doCaseFold = True):
     JobList = []
     for File in os.listdir(Path):
         if File.endswith('.json'):

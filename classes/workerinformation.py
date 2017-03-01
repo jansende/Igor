@@ -30,7 +30,7 @@ class WorkerInformationDecoder(json.JSONDecoder):
     def decode(self, s):
         obj = json.JSONDecoder.decode(self, s)
         if isinstance(obj, dict):
-            raise RuntimeError
+            raise RuntimeError('json represents a different object')
         return obj
     def default(self, dic):
         if 'Worker' not in dic:
