@@ -1,7 +1,8 @@
 try:
   import readline
 except ImportError:
-    print('pip install pyreadline')
+    print('You need to install readline.')
+    print('Under Windows use: pip install pyreadline')
     raise
 import cmd
 import glob
@@ -24,10 +25,8 @@ def printJobs(Directory, Worker = None):
     JobList = getJobList(Directory, filterByWorker=Worker)
     if len(JobList) == 0:
         raise RuntimeError('*** runtime error: no Jobs were found')
-
     WorkerList = set([ a.Information.Worker         for a in JobList ])
     StatusList = set([ a.Information.Status.lower() for a in JobList ])
-
     for Worker in WorkerList:
         print('========================================')
         print('{worker:^40}'.format(worker=Worker))
@@ -106,11 +105,13 @@ class JobViewer(cmd.Cmd):
     def do_show(self, arg):
         '''Shows detailed information about Jobs and Workers
         Usage: show [workers/jobs/NAME]
-        workers         ... displays an overview of all workers
-        jobs            ... displays an overview of all jobs
-        jobs WORKERNAME ... the same as before, but only displays jobs from a certain worker
+        workers     ... displays an overview of all workers
+        jobs        ... displays an overview of all jobs
+        jobs NAME   ... the same as before, but only displays jobs from a certain worker
         '''
         arguments = arg.split()
+        if len(arguments) == 0:
+            raise IndexError('*** Unknown syntax: ' + self.lastcmd)
         if   arguments[0].endswith('.json'):
             printInformation(arguments[0])
         elif arguments[0] == 'workers':
@@ -122,19 +123,19 @@ class JobViewer(cmd.Cmd):
                 printJobs(self._WorkingDirectory())
         else:
             raise NotImplementedError('*** Unknown syntax: ' + self.lastcmd)
-    def _complete_show_commands(self, text, *ignored):
-        commands = ['jobs','workers']
-        return [a for a in commands if a.startswith(text)]
+    def complete_show(self, *args):
+        files    = set(self._complete_file_names(*args, filter='*.json'))
+        commands = set(self._complete_show_commands(*args))
+        return list(commands | files)
     def _complete_file_names(self, text, *ignored, filter):
         try:
             files = glob.glob(os.path.join(self._WorkingDirectory(),filter))
             return [os.path.basename(a) for a in files if os.path.basename(a).startswith(text)]
         except:
             return []
-    def complete_show(self, *args):
-        commands = set(self._complete_show_commands(*args))
-        files    = set(self._complete_file_names(*args, filter='*.json'))
-        return list(commands | files)
+    def _complete_show_commands(self, text, *ignored):
+        commands = ['jobs','workers']
+        return [a for a in commands if a.startswith(text)]
     def do_exit(self, arg):
         '''Exit the JobViewer'''
         return True
