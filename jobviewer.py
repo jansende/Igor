@@ -14,9 +14,9 @@ import subprocess
 import threading
 import time
 
-from classes.job                import JobInformationDecoder, getJobList
-from classes.workerinformation  import WorkerInformationDecoder
-from classes.machineinformation import MachineInformationDecoder, getMachineList
+from classes.job                import JobInformation, getJobList
+from classes.workerinformation  import WorkerInformation
+from classes.machineinformation import MachineInformation, getMachineList
 
 def LoadJSONObject(File, Decoder):
     with open(File) as json_file:
@@ -49,7 +49,7 @@ def printMachines(Directory):
         print(Machine)
     print('========================================')
 def printMachineInformation(File):
-    Machine = LoadJSONObject(File, MachineInformationDecoder)
+    Machine = LoadJSONObject(File, MachineInformation.Decoder)
     print('========================================')
     print('{domain:^40}'.format(domain=Machine.Domain))
     print('========================================')
@@ -61,7 +61,7 @@ def printMachineInformation(File):
     print('OS:   {system} ({platform})'.format(system=Machine.System,platform=Machine.Platform))
     print('========================================')
 def printJobInformation(File):
-    Job = LoadJSONObject(File, JobInformationDecoder)
+    Job = LoadJSONObject(File, JobInformation.Decoder)
     print('========================================')
     print('{name:^40}'.format(name=Job.Name))
     print('========================================')
@@ -100,8 +100,8 @@ class JobViewer(cmd.Cmd):
     def _WorkingDirectory(self):
         #Gets the JobDirectory from the configuration file.
         with open(self.config_file) as json_file:
-            WorkerInformation = json.load(json_file, cls=WorkerInformationDecoder)
-            return WorkerInformation.JobDirectory
+            Worker = json.load(json_file, cls=WorkerInformation.Decoder)
+            return Worker.JobDirectory
     def do_show(self, arg):
         '''Shows detailed information about Jobs and Workers
         Usage: show [workers/jobs/NAME]

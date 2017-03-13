@@ -29,88 +29,88 @@ class MachineInformation(object):
         return '<MachineInformation: ' + self.Name + '@' + self.IpAddress + ' (' + str(self.NumberOfCores) + ' Cores, ' + self.Platform + ')>'
     def __str__(self):
         return self.Name + '@' + self.IpAddress + ' (' + str(self.NumberOfCores) + ' Cores, ' + self.Platform + ')'
-class MachineInformationEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, MachineInformation):
-            dic = {}
-            dic['Machine'] = {}
-            dic['Machine']['CurrentUser']   = obj.CurrentUser
-            dic['Machine']['Name']          = obj.Name
-            dic['Machine']['Domain']        = obj.Domain
-            dic['Machine']['IpAddress']     = obj.IpAddress
-            dic['Machine']['NumberOfCores'] = obj.NumberOfCores
-            dic['Machine']['Platform']      = obj.Platform
-            dic['Machine']['System']        = obj.System
-            dic['Machine']['MachineType']   = obj.MachineType
-            return dic
-        else:
-            raise TypeError
-class MachineInformationDecoder(json.JSONDecoder):
-    def __init__(self):
-        json.JSONDecoder.__init__(self, object_hook=self.default)
-    def decode(self, s):
-        obj = json.JSONDecoder.decode(self, s)
-        if isinstance(obj, dict):
-            raise RuntimeError('json represents a different object')
-        return obj
-    def default(self, dic):
-        if 'Machine' not in dic:
-            return dic
-        else:
-            obj = MachineInformation()
-            try:
-                obj.CurrentUser = dic['Machine']['CurrentUser']
-            except:
-                pass
-            try:
-                obj.Name = dic['Machine']['Name']
-            except:
-                pass
-            try:
-                obj.Domain = dic['Machine']['Domain']
-            except:
-                pass
-            try:
-                obj.IpAddress = dic['Machine']['IpAddress']
-            except:
-                pass
-            try:
-                obj.NumberOfCores = dic['Machine']['NumberOfCores']
-            except:
-                pass
-            try:
-                obj.Platform = dic['Machine']['Platform']
-            except:
-                pass
-            try:
-                obj.System = dic['Machine']['System']
-            except:
-                pass
-            try:
-                obj.MachineType = dic['Machine']['MachineType']
-            except:
-                pass
+    class Encoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, MachineInformation):
+                dic = {}
+                dic['Machine'] = {}
+                dic['Machine']['CurrentUser']   = obj.CurrentUser
+                dic['Machine']['Name']          = obj.Name
+                dic['Machine']['Domain']        = obj.Domain
+                dic['Machine']['IpAddress']     = obj.IpAddress
+                dic['Machine']['NumberOfCores'] = obj.NumberOfCores
+                dic['Machine']['Platform']      = obj.Platform
+                dic['Machine']['System']        = obj.System
+                dic['Machine']['MachineType']   = obj.MachineType
+                return dic
+            else:
+                raise TypeError
+    class Decoder(json.JSONDecoder):
+        def __init__(self):
+            json.JSONDecoder.__init__(self, object_hook=self.default)
+        def decode(self, s):
+            obj = json.JSONDecoder.decode(self, s)
+            if isinstance(obj, dict):
+                raise RuntimeError('json represents a different object')
             return obj
-class MachineInformationLoader(object):
-    def __init__(self):
-        pass
-    def load(self):
-        obj = MachineInformation()
-        obj.CurrentUser = os.getlogin()
-        try:
-            obj.Name      = socket.gethostname()
-            obj.Domain    = socket.getfqdn(obj.Name)
-            obj.IpAddress = socket.gethostbyname(obj.Name)
-        except:
+        def default(self, dic):
+            if 'Machine' not in dic:
+                return dic
+            else:
+                obj = MachineInformation()
+                try:
+                    obj.CurrentUser = dic['Machine']['CurrentUser']
+                except:
+                    pass
+                try:
+                    obj.Name = dic['Machine']['Name']
+                except:
+                    pass
+                try:
+                    obj.Domain = dic['Machine']['Domain']
+                except:
+                    pass
+                try:
+                    obj.IpAddress = dic['Machine']['IpAddress']
+                except:
+                    pass
+                try:
+                    obj.NumberOfCores = dic['Machine']['NumberOfCores']
+                except:
+                    pass
+                try:
+                    obj.Platform = dic['Machine']['Platform']
+                except:
+                    pass
+                try:
+                    obj.System = dic['Machine']['System']
+                except:
+                    pass
+                try:
+                    obj.MachineType = dic['Machine']['MachineType']
+                except:
+                    pass
+                return obj
+    class Loader(object):
+        def __init__(self):
             pass
-        try:
-            obj.NumberOfCores = multiprocessing.cpu_count()
-        except:
-            pass
-        obj.Platform    = platform.platform(aliased=True, terse=True)
-        obj.System      = platform.system()
-        obj.MachineType = platform.machine()
-        return obj
+        def load(self):
+            obj = MachineInformation()
+            obj.CurrentUser = os.getlogin()
+            try:
+                obj.Name      = socket.gethostname()
+                obj.Domain    = socket.getfqdn(obj.Name)
+                obj.IpAddress = socket.gethostbyname(obj.Name)
+            except:
+                pass
+            try:
+                obj.NumberOfCores = multiprocessing.cpu_count()
+            except:
+                pass
+            obj.Platform    = platform.platform(aliased=True, terse=True)
+            obj.System      = platform.system()
+            obj.MachineType = platform.machine()
+            return obj
 
 def getMachineList(Path, doCaseFold = True):
     MachineList = []
@@ -118,21 +118,21 @@ def getMachineList(Path, doCaseFold = True):
         if File.endswith('.json'):
             try:
                 with open(os.path.join(Path,File)) as json_file:
-                    MachineList.append(json.load(json_file, cls=MachineInformationDecoder))
+                    MachineList.append(json.load(json_file, cls=MachineInformation.Decoder))
             except:
                 continue
     MachineList.sort(key = lambda x: x.Domain)
     return MachineList
 
 if __name__== '__main__':
-    test = MachineInformationLoader().load()
+    test = MachineInformation.Loader().load()
     print(test)
-    data = json.dumps(test, cls=MachineInformationEncoder)
-    resu = json.loads(data, cls=MachineInformationDecoder)
+    data = json.dumps(test, cls=MachineInformation.Encoder)
+    resu = json.loads(data, cls=MachineInformation.Decoder)
     print(resu)
 
-    test_list = [MachineInformationLoader().load(),MachineInformationLoader().load(),MachineInformationLoader().load()]
+    test_list = [MachineInformation.Loader().load(),MachineInformation.Loader().load(),MachineInformation.Loader().load()]
     print(test_list)
-    data_list = json.dumps(test_list, cls=MachineInformationEncoder)
-    resu_list = json.loads(data_list, cls=MachineInformationDecoder)
+    data_list = json.dumps(test_list, cls=MachineInformation.Encoder)
+    resu_list = json.loads(data_list, cls=MachineInformation.Decoder)
     print(resu_list)

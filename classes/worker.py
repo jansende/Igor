@@ -2,8 +2,8 @@ import json
 import threading
 import time
 
-from .machineinformation import MachineInformation, MachineInformationLoader
-from .workerinformation  import WorkerInformation, WorkerInformationDecoder
+from .machineinformation import MachineInformation
+from .workerinformation  import WorkerInformation
 from .job                import getJobList
 
 class Worker(threading.Thread):
@@ -16,12 +16,12 @@ class Worker(threading.Thread):
         self.loadInformationFromFile()
     def loadInformationFromFile(self):
         with open(self.File) as json_file:
-            self.Information = json.load(json_file, cls=WorkerInformationDecoder)
+            self.Information = json.load(json_file, cls=WorkerInformation.Decoder)
     def saveInformationToFile(self):
         with open(self.File,'w') as json_file:
-            json_file.write(json.dumps(self.Information, sort_keys=True, indent=2, cls=WorkerInformationEncoder))
+            json_file.write(json.dumps(self.Information, sort_keys=True, indent=2, cls=WorkerInformation.Encoder))
     def loadMachine(self):
-        self.Machine = MachineInformationLoader().load()
+        self.Machine = MachineInformation.Loader().load()
     def run(self):
         print('Worker started.')
         print('This is: ',self.Machine,sep='')

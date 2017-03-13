@@ -4,7 +4,7 @@ import os.path
 import subprocess
 import threading
 
-from .jobinformation import JobInformation, JobInformationEncoder, JobInformationDecoder
+from .jobinformation import JobInformation, JobInformation
 
 class Job(threading.Thread):
     def __init__(self, File):
@@ -16,13 +16,13 @@ class Job(threading.Thread):
         if not os.path.isfile(self.File):
             raise
         with open(self.File) as json_file:
-            self.Information = json.load(json_file, cls=JobInformationDecoder)
+            self.Information = json.load(json_file, cls=JobInformation.Decoder)
         if self.Information.hasErrors() and self.Status != 'FileError':
             self._markFile('FileError')
             raise
     def _saveInformationToFile(self):
         with open(self.File,'w') as json_file:
-            json_file.write(json.dumps(self.Information, sort_keys=True, indent=2, cls=JobInformationEncoder))
+            json_file.write(json.dumps(self.Information, sort_keys=True, indent=2, cls=JobInformation))
     def _markFile(self, Status):
         self.Information.Status = Status
         self._saveInformationToFile()
