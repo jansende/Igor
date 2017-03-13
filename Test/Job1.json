@@ -1,0 +1,10 @@
+{
+  "Job": {
+    "Name": "unknown",
+    "Priority": 0,
+    "Script": "echo 'Hello World'",
+    "Status": "Finished",
+    "Worker": "thal",
+    "WorkingDirectory": "."
+  }
+}
