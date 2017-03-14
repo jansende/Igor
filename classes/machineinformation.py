@@ -4,6 +4,7 @@ import os
 import platform
 import socket
 import threading
+from .helpers            import loadJSON, saveJSON
 
 class MachineInformation(object):
     def __init__(self, CurrentUser = 'unknown', Name = 'localhost', Domain = 'unknown', IpAddress = '127.0.0.1', NumberOfCores = 1, Platform = 'unknown', System = 'unknown', MachineType = 'unknown'):
@@ -117,8 +118,8 @@ def getMachineList(Path, doCaseFold = True):
     for File in os.listdir(Path):
         if File.endswith('.json'):
             try:
-                with open(os.path.join(Path,File)) as json_file:
-                    MachineList.append(json.load(json_file, cls=MachineInformation.Decoder))
+                with loadJSON(os.path.join(Path,File), MachineInformation) as Machine:
+                    MachineList.append(Machine)
             except:
                 continue
     MachineList.sort(key = lambda x: x.Domain)

@@ -17,10 +17,8 @@ import time
 from classes.job                import JobInformation, getJobList
 from classes.workerinformation  import WorkerInformation
 from classes.machineinformation import MachineInformation, getMachineList
+from classes.helpers            import loadJSON, saveJSON
 
-def LoadJSONObject(File, Decoder):
-    with open(File) as json_file:
-        return json.load(json_file, cls=Decoder)
 def printJobs(Directory, Worker = None):
     JobList = getJobList(Directory, filterByWorker=Worker)
     if len(JobList) == 0:
@@ -49,30 +47,30 @@ def printMachines(Directory):
         print(Machine)
     print('========================================')
 def printMachineInformation(File):
-    Machine = LoadJSONObject(File, MachineInformation.Decoder)
-    print('========================================')
-    print('{domain:^40}'.format(domain=Machine.Domain))
-    print('========================================')
-    print('User:', Machine.CurrentUser)
-    print('Name:', Machine.Name)
-    print('IP:  ', Machine.IpAddress)
-    print('----------------------------------------')
-    print('CPU:  {numberofcores} Cores ({machinetype})'.format(machinetype=Machine.MachineType,numberofcores=Machine.NumberOfCores))
-    print('OS:   {system} ({platform})'.format(system=Machine.System,platform=Machine.Platform))
-    print('========================================')
+    with loadJSON(File, MachineInformation) as Machine:
+        print('========================================')
+        print('{domain:^40}'.format(domain=Machine.Domain))
+        print('========================================')
+        print('User:', Machine.CurrentUser)
+        print('Name:', Machine.Name)
+        print('IP:  ', Machine.IpAddress)
+        print('----------------------------------------')
+        print('CPU:  {numberofcores} Cores ({machinetype})'.format(machinetype=Machine.MachineType,numberofcores=Machine.NumberOfCores))
+        print('OS:   {system} ({platform})'.format(system=Machine.System,platform=Machine.Platform))
+        print('========================================')
 def printJobInformation(File):
-    Job = LoadJSONObject(File, JobInformation.Decoder)
-    print('========================================')
-    print('{name:^40}'.format(name=Job.Name))
-    print('========================================')
-    print('Worker:   ', Job.Worker)
-    print('Priority: ', Job.Priority)
-    print('Status:   ', Job.Status)
-    print('----------------------------------------')
-    print('Script:   ', Job.Script)
-    print('TimeOut:  ', Job.TimeOut)
-    print('Directory:', Job.WorkingDirectory)
-    print('========================================')
+    with loadJSON(File, JobInformation) as Job:
+        print('========================================')
+        print('{name:^40}'.format(name=Job.Name))
+        print('========================================')
+        print('Worker:   ', Job.Worker)
+        print('Priority: ', Job.Priority)
+        print('Status:   ', Job.Status)
+        print('----------------------------------------')
+        print('Script:   ', Job.Script)
+        print('TimeOut:  ', Job.TimeOut)
+        print('Directory:', Job.WorkingDirectory)
+        print('========================================')
 def printInformation(File):
     try:
         printMachineInformation(File)
@@ -84,7 +82,7 @@ def printInformation(File):
         return
     except:
         pass
-    raise FileNotFoundError('*** Ident error: file could not be read')
+    raise FileNotFoundError('*** File error: file could not be read')
 
 class JobViewer(cmd.Cmd):
     intro = 'Welcome to the Igor JobViewer. Type help or ? to list commands.'
@@ -99,8 +97,7 @@ class JobViewer(cmd.Cmd):
             print(Error)
     def _WorkingDirectory(self):
         #Gets the JobDirectory from the configuration file.
-        with open(self.config_file) as json_file:
-            Worker = json.load(json_file, cls=WorkerInformation.Decoder)
+        with loadJSON(self.config_file, WorkerInformation) as Worker:
             return Worker.JobDirectory
     def do_show(self, arg):
         '''Shows detailed information about Jobs and Workers
@@ -113,7 +110,7 @@ class JobViewer(cmd.Cmd):
         if len(arguments) == 0:
             raise IndexError('*** Unknown syntax: ' + self.lastcmd)
         if   arguments[0].endswith('.json'):
-            printInformation(arguments[0])
+            printInformation(os.path.join(self._WorkingDirectory(),arguments[0]))
         elif arguments[0] == 'workers':
             printMachines(self._WorkingDirectory())
         elif arguments[0] == 'jobs':

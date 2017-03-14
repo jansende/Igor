@@ -5,6 +5,7 @@ import time
 from .machineinformation import MachineInformation
 from .workerinformation  import WorkerInformation
 from .job                import getJobList
+from .helpers            import loadJSON, saveJSON
 
 class Worker(threading.Thread):
     def __init__(self, File):
@@ -15,11 +16,11 @@ class Worker(threading.Thread):
         self.loadMachine()
         self.loadInformationFromFile()
     def loadInformationFromFile(self):
-        with open(self.File) as json_file:
-            self.Information = json.load(json_file, cls=WorkerInformation.Decoder)
+        with loadJSON(self.File, WorkerInformation) as Information:
+            self.Information = Information
     def saveInformationToFile(self):
-        with open(self.File,'w') as json_file:
-            json_file.write(json.dumps(self.Information, sort_keys=True, indent=2, cls=WorkerInformation.Encoder))
+        with saveJSON(self.File, WorkerInformation) as Information:
+            Information = self.Information
     def loadMachine(self):
         self.Machine = MachineInformation.Loader().load()
     def run(self):
