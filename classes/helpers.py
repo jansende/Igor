@@ -2,14 +2,18 @@ import contextlib
 import json
 
 @contextlib.contextmanager
-def loadJSON(File, ObjectClass):
-    json_file = open(File)
-    yield json.load(json_file, cls=ObjectClass.Decoder)
-    json_file.close()
-@contextlib.contextmanager
-def saveJSON(File, ObjectClass):
-    json_file = open(File, 'w')
-    Object = ObjectClass()
+def openJSON(File, ObjectClass, mode = 'r'):
+    if mode not in ['r', 'u', 'w']:
+        raise ValueError('must have exactly one of read/write/update mode')
+    if mode in ['r', 'u']:
+        json_file = open(File)
+        Object = json.load(json_file, cls=ObjectClass.Decoder)
+        json_file.close()
+    else:
+        Object = ObjectClass()
+    if mode in ['u', 'w']:
+        json_file = open(File, 'w')
     yield Object
-    json_file.write(json.dumps(Object, sort_keys=True, indent=2, cls=ObjectClass.Encoder))
-    json_file.close()
+    if mode in ['u', 'w']:
+        json_file.write(json.dumps(Object, sort_keys=True, indent=2, cls=ObjectClass.Encoder))
+        json_file.close()

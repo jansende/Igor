@@ -4,7 +4,7 @@ import os
 import platform
 import socket
 import threading
-from .helpers            import loadJSON, saveJSON
+from .helpers            import openJSON
 
 class MachineInformation(object):
     def __init__(self, CurrentUser = 'unknown', Name = 'localhost', Domain = 'unknown', IpAddress = '127.0.0.1', NumberOfCores = 1, Platform = 'unknown', System = 'unknown', MachineType = 'unknown'):
@@ -118,7 +118,7 @@ def getMachineList(Path, doCaseFold = True):
     for File in os.listdir(Path):
         if File.endswith('.json'):
             try:
-                with loadJSON(os.path.join(Path,File), MachineInformation) as Machine:
+                with openJSON(os.path.join(Path,File), MachineInformation) as Machine:
                     MachineList.append(Machine)
             except:
                 continue

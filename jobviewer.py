@@ -13,11 +13,12 @@ import socket
 import subprocess
 import threading
 import time
+import copy
 
 from classes.job                import JobInformation, getJobList
 from classes.workerinformation  import WorkerInformation
 from classes.machineinformation import MachineInformation, getMachineList
-from classes.helpers            import loadJSON, saveJSON
+from classes.helpers            import openJSON
 
 def printJobs(Directory, Worker = None):
     JobList = getJobList(Directory, filterByWorker=Worker)
@@ -47,7 +48,7 @@ def printMachines(Directory):
         print(Machine)
     print('========================================')
 def printMachineInformation(File):
-    with loadJSON(File, MachineInformation) as Machine:
+    with openJSON(File, MachineInformation) as Machine:
         print('========================================')
         print('{domain:^40}'.format(domain=Machine.Domain))
         print('========================================')
@@ -59,7 +60,7 @@ def printMachineInformation(File):
         print('OS:   {system} ({platform})'.format(system=Machine.System,platform=Machine.Platform))
         print('========================================')
 def printJobInformation(File):
-    with loadJSON(File, JobInformation) as Job:
+    with openJSON(File, JobInformation) as Job:
         print('========================================')
         print('{name:^40}'.format(name=Job.Name))
         print('========================================')
@@ -97,14 +98,20 @@ class JobViewer(cmd.Cmd):
             print(Error)
     def _WorkingDirectory(self):
         #Gets the JobDirectory from the configuration file.
-        with loadJSON(self.config_file, WorkerInformation) as Worker:
+        with openJSON(self.config_file, WorkerInformation) as Worker:
             return Worker.JobDirectory
     def do_show(self, arg):
-        '''Shows detailed information about Jobs and Workers
-        Usage: show [workers/jobs/NAME]
-        workers     ... displays an overview of all workers
-        jobs        ... displays an overview of all jobs
-        jobs NAME   ... the same as before, but only displays jobs from a certain worker
+        '''
+           Display an overview of all jobs
+           Usage: show jobs [WORKER]
+               WORKER      ... filters jobs to display only those handled by WORKER
+
+           Display an overview of all workers
+           Usage: show workers
+
+           Display information for a file (regardless if worker or job)
+           Usage: show JSON_FILE
+               JSON_FILE   ... job or workers file
         '''
         arguments = arg.split()
         if len(arguments) == 0:
@@ -124,6 +131,39 @@ class JobViewer(cmd.Cmd):
         files    = set(self._complete_file_names(*args, filter='*.json'))
         commands = set(self._complete_show_commands(*args))
         return list(commands | files)
+    def do_redo(self, arg):
+        '''
+           Restart a given job
+           Usage: redo JSON_FILE
+               JSON_FILE   ... job file
+        '''
+        arguments = arg.split()
+        if len(arguments) == 0:
+            raise IndexError('*** Unknown syntax: ' + self.lastcmd)
+        if   arguments[0].endswith('.json'):
+            with openJSON(os.path.join(self._WorkingDirectory(),arguments[0]), JobInformation, 'u') as New:
+                New.Status = 'ToDo'
+        else:
+            raise NotImplementedError('*** Unknown syntax: ' + self.lastcmd)
+    def complete_redo(self, *args):
+        files    = set(self._complete_file_names(*args, filter='*.json'))
+        return list(files)
+    def do_reassign(self, arg):
+        '''
+           Reassigns a given job to a new worker
+           Usage: reassign JSON_FILE WORKER
+               JSON_FILE   ... job file
+               WORKER      ... name of the worker the job is assigned to
+        '''
+        arguments = arg.split()
+        if len(arguments) == 2:
+            with openJSON(os.path.join(self._WorkingDirectory(),arguments[0]), JobInformation, 'u') as New:
+                New.Worker = arguments[1]
+        else:
+            raise NotImplementedError('*** Unknown syntax: ' + self.lastcmd)
+    def complete_reassign(self, *args):
+        files    = set(self._complete_file_names(*args, filter='*.json'))
+        return list(files)
     def _complete_file_names(self, text, *ignored, filter):
         try:
             files = glob.glob(os.path.join(self._WorkingDirectory(),filter))

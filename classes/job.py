@@ -5,7 +5,7 @@ import subprocess
 import threading
 
 from .jobinformation import JobInformation, JobInformation
-from .helpers        import loadJSON, saveJSON
+from .helpers        import openJSON
 
 class Job(threading.Thread):
     def __init__(self, File):
@@ -16,14 +16,14 @@ class Job(threading.Thread):
     def _loadInformationFromFile(self):
         if not os.path.isfile(self.File):
             raise
-        with loadJSON(self.File, JobInformation) as Information:
+        with openJSON(self.File, JobInformation) as Information:
             self.Information = Information
         if self.Information.hasErrors() and self.Status != 'FileError':
             self._markFile('FileError')
             raise
     def _saveInformationToFile(self):
-        with saveJSON(self.File, JobInformation) as Information:
-            Information = self.Information
+        with openJSON(self.File, JobInformation, 'u') as Information:
+            Information.__dict__ = self.Information.__dict__
     def _markFile(self, Status):
         self.Information.Status = Status
         self._saveInformationToFile()
