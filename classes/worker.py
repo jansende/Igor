@@ -17,7 +17,7 @@ class Worker(threading.Thread):
         self.loadInformationFromFile()
     def loadInformationFromFile(self):
         with openJSON(self.File, WorkerInformation) as Information:
-            self.Information = Information
+            self.Information.__dict__  = Information.__dict__ 
     def saveInformationToFile(self):
         with openJSON(self.File, WorkerInformation, 'u') as Information:
             Information.__dict__ = self.Information.__dict__

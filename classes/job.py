@@ -14,10 +14,8 @@ class Job(threading.Thread):
         self.Information = JobInformation()
         self._loadInformationFromFile()
     def _loadInformationFromFile(self):
-        if not os.path.isfile(self.File):
-            raise
         with openJSON(self.File, JobInformation) as Information:
-            self.Information = Information
+            self.Information.__dict__  = Information.__dict__ 
         if self.Information.hasErrors() and self.Status != 'FileError':
             self._markFile('FileError')
             raise
