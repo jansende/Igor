@@ -15,13 +15,13 @@ class Job(threading.Thread):
         self._loadInformationFromFile()
     def _loadInformationFromFile(self):
         with openJSON(self.File, JobInformation) as Information:
-            self.Information.__dict__  = Information.__dict__ 
-        if self.Information.hasErrors() and self.Status != 'FileError':
+            self.Information.__dict__.update(Information.__dict__)
+        if self.Information.hasErrors and self.Status != 'FileError':
             self._markFile('FileError')
             raise
     def _saveInformationToFile(self):
         with openJSON(self.File, JobInformation, 'u') as Information:
-            Information.__dict__ = self.Information.__dict__
+            Information.__dict__.update(self.Information.__dict__)
     def _markFile(self, Status):
         self.Information.Status = Status
         self._saveInformationToFile()

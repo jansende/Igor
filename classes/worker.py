@@ -17,10 +17,10 @@ class Worker(threading.Thread):
         self.loadInformationFromFile()
     def loadInformationFromFile(self):
         with openJSON(self.File, WorkerInformation) as Information:
-            self.Information.__dict__  = Information.__dict__ 
+            self.Information.__dict__.update(Information.__dict__)
     def saveInformationToFile(self):
         with openJSON(self.File, WorkerInformation, 'u') as Information:
-            Information.__dict__ = self.Information.__dict__
+            Information.__dict__.update(self.Information.__dict__)
     def loadMachine(self):
         self.Machine = MachineInformation.Loader().load()
     def run(self):
@@ -35,8 +35,8 @@ class Worker(threading.Thread):
                 self.shutdown()
                 break
             print('Done (Running in "',self.Information.Mode,'"-Mode.)',sep='')
-            print('Currently ',self.Machine.NumberOfRunningJobs(),' of ',self.Information.MaximumJobNumber,' Slots are running Jobs.',sep='')
-            if self.Machine.NumberOfRunningJobs() < self.Information.MaximumJobNumber:
+            print('Currently ',self.Machine.NumberOfRunningJobs,' of ',self.Information.MaximumJobNumber,' Slots are running Jobs.',sep='')
+            if self.Machine.NumberOfRunningJobs < self.Information.MaximumJobNumber:
                 print('There is room for more!')
                 print('Searching for Jobs in:', self.Information.JobDirectory)
                 JobList = self._getJobList()
@@ -45,7 +45,7 @@ class Worker(threading.Thread):
                     self.shutdown()
                     print('All Jobs completed!')
                     break
-                for i in range(0,self.Information.MaximumJobNumber-self.Machine.NumberOfRunningJobs()):
+                for i in range(0,self.Information.MaximumJobNumber-self.Machine.NumberOfRunningJobs):
                     if len(JobList) == 0:
                         break
                     Thread = JobList.pop()
@@ -61,7 +61,7 @@ class Worker(threading.Thread):
         self._waitForJobsToFinish()
         print('Done')
     def _waitForJobsToFinish(self):
-        while threading.active_count() > self.Machine.ThreadOffset():
+        while threading.active_count() > self.Machine.ThreadOffset:
             time.sleep(1)
     def _getJobList(self):
         print('Looking for new Jobs...',end='')
