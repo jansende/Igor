@@ -1,6 +1,7 @@
 import json
 import threading
 import time
+import os.path
 
 from .machineinformation import MachineInformation
 from .workerinformation  import WorkerInformation
@@ -23,12 +24,16 @@ class Worker(threading.Thread):
             Information.__dict__.update(self.Information.__dict__)
     def loadMachine(self):
         self.Machine = MachineInformation.Loader().load()
+    def saveMachine(self):
+        with openJSON(os.path.join(self.Information.JobDirectory, self.Machine.Name + '.json'),MachineInformation,'w') as Hardware:
+            Hardware.__dict__.update(self.Machine.__dict__)
     def run(self):
         print('Worker started.')
         print('This is: ',self.Machine,sep='')
         while True:
             print('Checking Server Status...',end='')
             self.loadMachine()
+            self.saveMachine()
             self.loadInformationFromFile()
             if self.Information.Mode == 'Shutdown':
                 print()

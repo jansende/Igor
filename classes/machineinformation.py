@@ -3,11 +3,12 @@ import os
 import platform
 import socket
 import threading
+import time
 from .helpers            import openJSON
 
 class MachineInformation(object):
     JSONName = 'Machine'
-    def __init__(self, CurrentUser = 'unknown', Name = 'localhost', Domain = 'unknown', IpAddress = '127.0.0.1', NumberOfCores = 1, Platform = 'unknown', System = 'unknown', MachineType = 'unknown'):
+    def __init__(self, CurrentUser = 'unknown', Name = 'localhost', Domain = 'unknown', IpAddress = '127.0.0.1', NumberOfCores = 1, Platform = 'unknown', System = 'unknown', MachineType = 'unknown', TimeStamp = time.ctime()):
         self.CurrentUser   = CurrentUser
         self.Name          = Name
         self.Domain        = Domain
@@ -16,6 +17,7 @@ class MachineInformation(object):
         self.Platform      = Platform
         self.System        = System
         self.MachineType   = MachineType
+        self.TimeStamp     = TimeStamp
     @property
     def ThreadOffset(self):
         if   self.System == 'Windows':
