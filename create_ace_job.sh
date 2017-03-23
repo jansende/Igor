@@ -28,11 +28,11 @@ if [ -n "$OPTHELP" ]; then
     echo "create_ace_job.sh creates a JSON Job File for the Igor JobServer"
     echo "Usage: create_ace_jobs.sh [OPTION] file"
     echo "Arguments:"
-    echo " -j, --jobdir=DIRECTORY   Creates the Job File in DIRECTORY instead of ."
-    echo " -b, --basedir=DIRECTORY  Tells the jobserver to run ACE in DIRECTORY instead of ."
+    echo " -j, --jobdir DIRECTORY   Creates the Job File in DIRECTORY instead of ."
+    echo " -b, --basedir DIRECTORY  Tells the jobserver to run ACE in DIRECTORY instead of ."
     echo " -l, --log                Writes the output of ACE into file.log"
-    echo " -c, --corenum=CORES      Run Ace on that many cores"
-    echo " -w, --worker=WORKER      Assign WORKER to the Job"
+    echo " -c, --corenum CORES      Run Ace on that many cores"
+    echo " -w, --worker WORKER      Assign WORKER to the Job"
     echo " -h, --help               To display this information."
     exit 0
 fi
