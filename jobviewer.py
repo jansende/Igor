@@ -20,6 +20,23 @@ from classes.workerinformation  import WorkerInformation
 from classes.machineinformation import MachineInformation, getMachineList
 from classes.helpers            import openJSON
 
+def cleanJobs(Directory, Worker = None):
+    for File in os.listdir(Directory):
+        if File.endswith('.json'):
+            try:
+                with openJSON(os.path.join(Directory,File), JobInformation) as Job:
+                    if Job.Status == 'Finished':
+                        os.remove(os.path.join(Directory,File))
+            except:
+                continue
+def cleanMachines(Directory):
+    for File in os.listdir(Directory):
+        if File.endswith('.json'):
+            try:
+                with openJSON(os.path.join(Directory,File), MachineInformation) as Machine:
+                    os.remove(os.path.join(Directory,File))
+            except:
+                continue
 def printJobs(Directory, Worker = None):
     JobList = getJobList(Directory, filterByWorker=Worker)
     if len(JobList) == 0:
@@ -131,6 +148,27 @@ class JobViewer(cmd.Cmd):
         files    = set(self._complete_file_names(*args, filter='*.json'))
         commands = set(self._complete_show_commands(*args))
         return list(commands | files)
+    def do_clean(self, arg):
+        '''
+           Removes all completed jobs from the job folder
+           Usage: clean jobs
+
+           Removes all worker information from the worker information folder
+           Usage: clean workers
+        '''
+        arguments = arg.split()
+        if len(arguments) != 1:
+            raise IndexError('*** Unknown syntax: ' + self.lastcmd)
+        if arguments[0] == 'workers':
+            cleanMachines(self._WorkingDirectory())
+        elif arguments[0] == 'jobs':
+            cleanJobs(self._WorkingDirectory())
+        else:
+            raise NotImplementedError('*** Unknown syntax: ' + self.lastcmd)
+    def complete_clean(self, *args):
+        #The commands are the same as for show
+        commands = set(self._complete_show_commands(*args))
+        return list(commands)
     def do_redo(self, arg):
         '''
            Restart a given job
@@ -162,6 +200,20 @@ class JobViewer(cmd.Cmd):
         else:
             raise NotImplementedError('*** Unknown syntax: ' + self.lastcmd)
     def complete_reassign(self, *args):
+        files    = set(self._complete_file_names(*args, filter='*.json'))
+        return list(files)
+    def do_delete(self, arg):
+        '''
+           Deletes a given job file
+           Usage: delete JSON_FILE
+               JSON_FILE   ... job file
+        '''
+        arguments = arg.split()
+        if len(arguments) == 1:
+            os.remove(os.path.join(self._WorkingDirectory(),arguments[0]))
+        else:
+            raise NotImplementedError('*** Unknown syntax: ' + self.lastcmd)
+    def complete_delete(self, *args):
         files    = set(self._complete_file_names(*args, filter='*.json'))
         return list(files)
     def _complete_file_names(self, text, *ignored, filter):
