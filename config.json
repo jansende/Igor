@@ -3,7 +3,6 @@
     "JobDirectory"     : ".",
     "filterByName"     : false,
     "RefreshTime"      : 5.0,
-    "MaximumJobNumber" : 4,
-    "ServerStatus"     : "Server"
+    "MaximumJobNumber" : 4
   }
 }
